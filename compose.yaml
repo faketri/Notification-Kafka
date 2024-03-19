@@ -1,0 +1,38 @@
+version: '3.5'
+
+services:
+  service-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: /data/postgres
+    volumes:
+     - service-db:/data/postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - service-db
+    restart: unless-stopped
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    networks:
+      - service-db
+    restart: unless-stopped
+
+networks:
+  service-db:
+    driver: bridge
+
+volumes:
+  service-db:
+  pgadmin:
