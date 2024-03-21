@@ -1,21 +1,28 @@
 package org.example;
 
 import org.apache.kafka.clients.admin.NewTopic;
-import org.springframework.beans.factory.annotation.Value;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.example.entity.Users;
 import org.springframework.context.annotation.Bean;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
+
 @Service
 public class KafkaConsumer {
 
+    private final String topic = "${TOPIC_NAME}";
+    private final String group = "${KAFKA_GROUP_ID}";
+
     @Bean
     public NewTopic topic() {
-        return new NewTopic("message", 1, (short) 1);
+        return new NewTopic(topic, 1, (short) 1);
     }
 
-    @KafkaListener(topics = "message", groupId = "test")
-    public void listen(String message){
-        System.out.println(message);
+    @KafkaListener(topics = topic, groupId = group)
+    public void listen(ConsumerRecord<String, Users> record){
+        System.out.println(record.key());
+        System.out.println(record.value().getLogin());;
     }
+
 }
